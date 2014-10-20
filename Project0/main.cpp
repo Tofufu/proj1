@@ -8,7 +8,6 @@
 #include <iostream>
 
 #include "demo.h"
-
 #include <getopt.h>
 
 
@@ -19,7 +18,7 @@ int main(int argc, char* argv[]) {
 
 
   Demo demo;
-  demo.resize(400,400);
+  demo.resize(800,600);
     demo.opengl();
   demo.show();
 

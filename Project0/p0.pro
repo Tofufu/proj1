@@ -15,13 +15,11 @@ INCLUDEPATH += .
 SOURCES += main.cpp \
            demo.cpp \
            openglwindow.cpp \
-           renderwindow.cpp \
-    dialog.cpp
+           renderwindow.cpp
 
 HEADERS += demo.h \
            openglwindow.h \
-           renderwindow.h \
-    dialog.h
+           renderwindow.h
 
 RESOURCES += \
     shaders.qrc

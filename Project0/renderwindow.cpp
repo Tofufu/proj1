@@ -1,12 +1,14 @@
 #include "renderwindow.h"
+#include "tiny_obj_loader.h"
 
 #include <QOpenGLDebugLogger>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 #include <QScreen>
-
+#include <QFileDialog>
 #include <iostream>
+#include <QSlider>
 
 static const char *vertexShaderSource =
     "#version 330\n"
@@ -36,6 +38,61 @@ RenderWindow::RenderWindow()
 {
     setAnimating(true);
 }
+
+/*              NEED TO FIGURE OUT HOW TO OPEN UP AN OBJ FILE!!!!
+void RenderWindowWidget::fileDialogOpened() {
+    QString filename = QFileDialog::getOpenFileName(this, "Open File");
+    //QMessageBox::information(this, "File Selected", filename.length() == 0 ? "No File Selected" : filename);
+}
+*/
+RenderWindowWidget::RenderWindowWidget(QWidget *parent)
+{
+    renWin = new RenderWindow();
+
+    QWidget* widget = QWidget::createWindowContainer( renWin );
+          QHBoxLayout* layout = new QHBoxLayout(this);
+
+          layout->addWidget(widget);
+
+           QLabel *SliderLabels = new QLabel("Toggle Rotation (X, Y, Z)");
+
+          QPushButton *OpeningFileButton = new QPushButton("Open File");
+          QPushButton *OpeningObjectButton = new QPushButton("Add Object File");
+
+         // QObject::connect(OpeningFileButton, SIGNAL(clicked()), this, SLOT(fileDialogOpened()));
+          //QObject::connect(OpeningObjectButton, SIGNAL(clicked()), this, SLOT(fileDialogOpened()));
+
+          QVBoxLayout *ButtonLayout = new QVBoxLayout; //Lines up Vertically
+          ButtonLayout->addWidget(OpeningFileButton);
+          ButtonLayout->addWidget(OpeningObjectButton);
+          ButtonLayout->addWidget(SliderLabels);
+
+
+          xSlider = createSlider();
+          ySlider = createSlider();
+          zSlider = createSlider();
+
+          QHBoxLayout *SliderLayout = new QHBoxLayout;
+          SliderLayout->addWidget(xSlider);
+          SliderLayout->addWidget(ySlider);
+          SliderLayout->addWidget(zSlider);
+          ButtonLayout->addLayout(SliderLayout);
+
+          layout->addLayout(ButtonLayout);
+}
+
+QSlider *RenderWindowWidget::createSlider()
+{
+    QSlider *slider = new QSlider(Qt::Vertical);
+    slider->setRange(0, 360 * 16);
+    slider->setSingleStep(16);
+    slider->setPageStep(15 * 16);
+    slider->setTickInterval(15 * 16); //tick marks
+    slider->setTickPosition(QSlider::TicksRight); //place where tick marks will be drawn
+    return slider;
+}
+
+
 
 void RenderWindow::checkError(const QString &prefix)
 {
@@ -67,10 +124,14 @@ void RenderWindow::checkError(const QString &prefix)
     }
 }
 
+
+//This is the triangle stuffs
 void RenderWindow::initialize()
 {
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    //red, green, blue, alpha
 
     glEnable(GL_DEPTH_TEST);
     m_program = new QOpenGLShaderProgram(this);
@@ -80,9 +141,9 @@ void RenderWindow::initialize()
         m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
     } else {
         m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/simple.vert");
-        m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/simple.frag");
+        m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/simple.frag"); //this is the stuff that let's us 'color'
     }
-    m_program->link();
+    m_program->link(); //links together all shaders added via addshader
 
     m_posAttr = m_program->attributeLocation("posAttr");
     m_colAttr = m_program->attributeLocation("colAttr");
@@ -196,4 +257,7 @@ void RenderWindow::render()
     if(isAnimating()) {
         ++m_frame;
     }
+
+
 }
+
